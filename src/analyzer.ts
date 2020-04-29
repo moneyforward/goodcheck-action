@@ -36,7 +36,7 @@ export default class Analyzer extends StaticCodeAnalyzer {
             };
             message: string;
             justifications?: string[];
-          }      
+          }
           const issues: Issue[] = JSON.parse(Buffer.concat(buffers).toString());
           debug(`Detected %d problem(s).`, issues.length);
           for (const issue of issues) this.push({
@@ -50,7 +50,7 @@ export default class Analyzer extends StaticCodeAnalyzer {
           this.push(null);
           done();
         }
-        })
+      })
     ];
     transformers.reduce((prev, next) => prev.pipe(next));
     return [transformers[0], transformers[transformers.length - 1]];
