@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import stream from 'stream';
-import { Transformers } from '@moneyforward/sca-action-core';
-import Analyzer from '../src/analyzer'
+import Analyzer from '../src'
 import { AssertionError } from 'assert';
 
 describe('Transform', () => {
@@ -31,16 +30,13 @@ describe('Transform', () => {
       public constructor() {
         super();
       }
-      public createTransformStreams(): Transformers {
+      public createTransformStreams(): stream.Transform[] {
         return super.createTransformStreams();
       }
     })();
-    const [prev, next = prev] = analyzer.createTransformStreams();
-    stream.Readable.from(text).pipe(prev);
-    for await (const problem of next) {
-      expect(problem).to.deep.equal(expected);
-      return;
-    }
+    const transform = analyzer.createTransformStreams()
+      .reduce((previous, current) => previous.pipe(current), stream.Readable.from(text));
+    for await (const problem of transform) return expect(problem).to.deep.equal(expected);
     throw new AssertionError({ message: 'There was no problem to expect.', expected });
   });
 });
